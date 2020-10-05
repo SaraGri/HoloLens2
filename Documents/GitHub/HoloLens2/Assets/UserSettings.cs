@@ -11,7 +11,7 @@ using Microsoft.MixedReality.Toolkit.Experimental.UI;
 public class UserSettings : MonoBehaviour
 {
     //public InputField test;
-    private IMixedRealitySpatialAwarenessSystem spatialAwarenessService;
+    //private IMixedRealitySpatialAwarenessSystem spatialAwarenessService;
     private IMixedRealitySpatialAwarenessMeshObserver observer;
     //Für UserInput
     private int index;
@@ -28,7 +28,7 @@ public class UserSettings : MonoBehaviour
     {
         //für die Position des Zwischenspeicher-Arrays
         index = 0;
-        spatialAwarenessService = CoreServices.SpatialAwarenessSystem;
+        //spatialAwarenessService = CoreServices.SpatialAwarenessSystem;
         //observ = gameObject.GetComponent<GameObject>();
        // test = gameObject.GetComponent<InputField>();
         // observer = spatialAwarenessService.GetComponent<IMixedRealitySpatialAwarenessMeshObserver>();
@@ -81,6 +81,12 @@ public class UserSettings : MonoBehaviour
         keyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default, false, false, false, false);
     }
 
+    public void cancelSettings() {
+        for (int i = 0; i < keyboardEntry.Length; i++)
+        {
+            keyboardEntry[i] = null;
+        }
+    }
 
     private void userInformation(string inputFieldPlace)
     {
@@ -103,7 +109,6 @@ public class UserSettings : MonoBehaviour
 
     private void getObserverType()
     {
-        //https://answers.unity.com/questions/1167834/how-do-you-access-the-text-value-of-the-dropdown-u.html
         switch (oType.options[oType.value].text)
         {
             case "Sphere":
@@ -194,14 +199,17 @@ public class UserSettings : MonoBehaviour
 
     private Vector3 StringToVector(int i)
     {
-        //https://answers.unity.com/questions/1134997/string-to-vector3.html
-        // split the items
-        string[] sInput = keyboardEntry[i].Split(',');
+        //
+        //Quelle: https://answers.unity.com/questions/1134997/string-to-vector3.html
+   
+        string[] sInput = keyboardEntry[i].Split('.');
         Vector3 result = new Vector3(
         float.Parse(sInput[0]),
         float.Parse(sInput[1]),
         float.Parse(sInput[2]));
         return result;
+        //
+        //
     }
 
     //save Usersettings
@@ -256,7 +264,7 @@ public class UserSettings : MonoBehaviour
     //Einstellungen für den Observer
 
     public void setUpdateIntervalObserver(float interval) {
-        //https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/SpatialAwareness/ConfiguringSpatialAwarenessMeshObserver.html
+
         if (0 < interval && interval < 5.1)
         {
             observer.UpdateInterval = interval;

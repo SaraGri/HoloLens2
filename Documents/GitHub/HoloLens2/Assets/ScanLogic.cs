@@ -13,7 +13,7 @@ using Windows.Perception.Spatial;
 using Windows.Perception.Spatial.Preview;
 using UnityEngine.XR.WSA;
 #endif
-//https://github.com/mtaulty/SceneUnderstanding/blob/master/Assets/Scripts/MyScript.cs
+
 public class ScanLogic : MonoBehaviour
 {
     public GameObject rootObject;
@@ -21,8 +21,15 @@ public class ScanLogic : MonoBehaviour
     //eine neue Szene erzeugen, die auf dem Mixed Reality-Headset gelegt wird
     public Scene underStandingscene;
     private bool initialised, suscanning;
-   
-    
+
+    //Test
+    private float spTime, saveTime;
+    private float spTime2, saveTime2;
+    //Declare these in your class
+    private int m_frameCounter = 0;
+    private float m_timeCounter = 0.0f;
+    private float m_lastFramerate = 0.0f;
+    public float m_refreshTime = 0.5f;
     // Start is called before the first frame update
     void Start()
     {
@@ -36,7 +43,39 @@ public class ScanLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
+        if (m_timeCounter < m_refreshTime)
+        {
+            m_timeCounter += Time.deltaTime;
+            m_frameCounter++;
+        }
+        else
+        {
+            //This code will break if you set your m_refreshTime to 0, which makes no sense.
+            m_lastFramerate = (float)m_frameCounter / m_timeCounter;
+            m_frameCounter = 0;
+            m_timeCounter = 0.0f;
+        }
+    }
+
+
+    private void s()
+    {
+
+        float t1, t2, t3;
+        t1 = spTime2 - spTime;
+     
+        t3 = saveTime2 - saveTime;
+        string testText = "SpatialMappingstartzeit " + spTime.ToString() + " SpatialMappingstopzeit " + spTime2.ToString() + "\t" ;
+        testText += "SpatialMappingzeit " + t1.ToString() + "  \t  " + " Speicherzeit  "+  t3.ToString() + "\n";
+        testText += "  \t  " + m_lastFramerate.ToString() + "\n\n";
+
+
+        string filePath = Path.Combine(Application.persistentDataPath, "Testwerte2");
+        using (TextWriter writer = File.CreateText(filePath))
+        {
+            writer.Write(testText);
+        }
     }
 
 
@@ -46,6 +85,7 @@ public class ScanLogic : MonoBehaviour
     {
         if (!observer.IsRunning) {
             observer.Resume();
+            spTime = DateTime.Now.Millisecond;
             Debug.Log("mapping startet");
         }
     }
@@ -54,6 +94,7 @@ public class ScanLogic : MonoBehaviour
         if (observer.IsRunning)
         {
             observer.Suspend();
+            spTime2 = DateTime.Now.Millisecond;
             Debug.Log("mapping stoppend");
         }
     }
@@ -80,22 +121,24 @@ public class ScanLogic : MonoBehaviour
     }
 
     public async void saveMesh() {
+        saveTime =  DateTime.Now.Millisecond;
         stopOrSuspendObserver();
 
-
-        //https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/SpatialAwareness/UsageGuide.html
+        s();
+      /*  
       /*  foreach (SpatialAwarenessMeshObject meshObject in observer.Meshes.Values)
         {
             // mesh = meshObject.i;
             
         }*/
         await SpatialMeshExporter.Save(Application.persistentDataPath, true);
+        saveTime2 =  DateTime.Now.Millisecond;
 
-        //für SceneUnderstanding
-        foreach (var sceneObject in underStandingscene.SceneObjects)
-        {
-                saveSceneUnderstandingMesh(sceneObject);
-        }
+        /* //für SceneUnderstanding
+         foreach (var sceneObject in underStandingscene.SceneObjects)
+         {
+                 saveSceneUnderstandingMesh(sceneObject);
+         }*/
 
     }
     //für SceneUnderstanding
@@ -135,13 +178,13 @@ public class ScanLogic : MonoBehaviour
             this.underStandingscene = await SceneObserver.ComputeAsync(querySettings, radius);
         }
     }
-    //https://github.com/microsoft/MixedReality-SceneUnderstanding-Samples/blob/master/Assets/SceneUnderstanding/Core/Understanding/Scripts/SceneUnderstandingManager.cs#L1154
+    
 #endif
 
 
 
 
-    //https://docs.microsoft.com/de-de/windows/mixed-reality/scene-understanding-sdk#sceneobjects
+    
     public void saveSceneUnderstandingMesh(IEnumerable<SceneObject> scene)
     {
         stopSceneUnderstanding();
@@ -267,7 +310,7 @@ public class ScanLogic : MonoBehaviour
         unityMesh.SetVertices(combinedMeshVertices);
         unityMesh.SetIndices(combinedMeshIndices.ToArray(), MeshTopology.Triangles, 0);
         unityMesh.RecalculateNormals();
-    https://docs.microsoft.com/de-de/windows/mixed-reality/typography
+    
         return unityMesh;
     }*/
 }
